@@ -11,6 +11,14 @@ import (
 const steamHost = "http://api.steampowered.com/"
 const steamAPIInterface = "ISteamUser/GetPlayerSummaries/v0002/"
 
+type Player struct {
+	pr *PlayerResponse
+}
+
+func (p *Player) showHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("response in handler: %v\n", p.pr)
+}
+
 type (
 	// SteamUser is a single player from the Steam API
 	SteamUser struct {
@@ -48,4 +56,9 @@ func main() {
 		return
 	}
 	fmt.Printf("response is: %v\n", &p)
+
+	player := &Player{pr: &p}
+
+	http.HandleFunc("/", player.showHandler)
+	http.ListenAndServe(":8001", nil)
 }
