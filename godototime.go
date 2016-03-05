@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -12,11 +13,20 @@ const steamHost = "http://api.steampowered.com/"
 const steamAPIInterface = "ISteamUser/GetPlayerSummaries/v0002/"
 
 type Player struct {
-	pr *PlayerResponse
+	pr PlayerResponse
 }
 
-func (p *Player) showHandler(w http.ResponseWriter, r *http.Request) {
+func (p Player) showHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("response in handler: %v\n", p.pr)
+
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8;")
+	w.WriteHeader(http.StatusOK)
+
+	t, err := template.New("main").ParseFiles("views/main.html.tpl")
+	if err != nil {
+		panic(err)
+	}
+	err = t.Execute(w, p.pr)
 }
 
 type (
@@ -55,9 +65,9 @@ func main() {
 		log.Println("ERROR:", err)
 		return
 	}
-	fmt.Printf("response is: %v\n", &p)
+	fmt.Printf("response is: %v\n", p)
 
-	player := &Player{pr: &p}
+	player := Player{pr: p}
 
 	http.HandleFunc("/", player.showHandler)
 	http.ListenAndServe(":8001", nil)
