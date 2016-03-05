@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 )
 
 const steamHost = "http://api.steampowered.com/"
@@ -22,11 +23,15 @@ func (p Player) showHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8;")
 	w.WriteHeader(http.StatusOK)
 
-	t, err := template.New("main").ParseFiles("views/main.html.tpl")
+	fp := path.Join("views", "main.html.tpl")
+	t, err := template.ParseFiles(fp)
 	if err != nil {
-		panic(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	err = t.Execute(w, p.pr)
+	if err := t.Execute(w, p.pr); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 type (
