@@ -5,7 +5,9 @@ Eventually, hopefully, will do most of what [dototime ](https://github.com/alida
 ### Development
 Install gin:
 `go get github.com/codegangsta/gin`
+
 Call the wrapper script:
 `./rerun.sh`
+
 Check it out:
 `http://localhost:3000`
